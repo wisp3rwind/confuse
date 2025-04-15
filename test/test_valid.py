@@ -1,17 +1,6 @@
-from __future__ import division, absolute_import, print_function
-
-try:
-    import enum
-    SUPPORTS_ENUM = True
-except ImportError:
-    SUPPORTS_ENUM = False
-
-try:
-    from collections.abc import Mapping, Sequence
-except ImportError:
-    from collections import Mapping, Sequence
-
+from collections.abc import Mapping, Sequence
 import confuse
+import enum
 import os
 import unittest
 from . import _root
@@ -115,18 +104,6 @@ class AsTemplateTest(unittest.TestCase):
         self.assertIsInstance(typ, confuse.String)
         self.assertEqual(typ.default, 'foo')
 
-    @unittest.skipIf(confuse.PY3, "unicode only present in Python 2")
-    def test_unicode_type_as_template(self):
-        typ = confuse.as_template(unicode)  # noqa ignore=F821
-        self.assertIsInstance(typ, confuse.String)
-        self.assertEqual(typ.default, confuse.REQUIRED)
-
-    @unittest.skipIf(confuse.PY3, "basestring only present in Python 2")
-    def test_basestring_as_template(self):
-        typ = confuse.as_template(basestring)  # noqa ignore=F821
-        self.assertIsInstance(typ, confuse.String)
-        self.assertEqual(typ.default, confuse.REQUIRED)
-
     def test_dict_as_template(self):
         typ = confuse.as_template({'key': 9})
         self.assertIsInstance(typ, confuse.MappingTemplate)
@@ -152,8 +129,6 @@ class AsTemplateTest(unittest.TestCase):
         typ = confuse.as_template(set())
         self.assertIsInstance(typ, confuse.Choice)
 
-    @unittest.skipUnless(SUPPORTS_ENUM,
-                         "enum not supported in this version of Python.")
     def test_enum_type_as_template(self):
         typ = confuse.as_template(enum.Enum)
         self.assertIsInstance(typ, confuse.Choice)

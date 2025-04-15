@@ -1,8 +1,6 @@
-from __future__ import division, absolute_import, print_function
-
+from collections import abc
 import os
 import re
-import sys
 
 from . import util
 from . import exceptions
@@ -18,12 +16,6 @@ try:
     SUPPORTS_PATHLIB = True
 except ImportError:
     SUPPORTS_PATHLIB = False
-
-if sys.version_info >= (3, 3):
-    from collections import abc
-else:
-    import collections as abc
-
 
 REQUIRED = object()
 """A sentinel indicating that there is no default value and an exception
@@ -130,7 +122,7 @@ class Number(Template):
     def convert(self, value, view):
         """Check that the value is an int or a float.
         """
-        if isinstance(value, util.NUMERIC_TYPES):
+        if isinstance(value, (int, float)):
             return value
         else:
             self.fail(
@@ -243,7 +235,7 @@ class String(Template):
     def convert(self, value, view):
         """Check that the value is a string and matches the pattern.
         """
-        if not isinstance(value, util.BASESTRING):
+        if not isinstance(value, str):
             self.fail(u'must be a string', view, True)
 
         if self.pattern and not self.regex.match(value):
@@ -385,7 +377,7 @@ class StrSeq(Template):
         self.split = split
 
     def _convert_value(self, x, view):
-        if isinstance(x, util.STRING):
+        if isinstance(x, str):
             return x
         elif isinstance(x, bytes):
             return x.decode('utf-8', 'ignore')
@@ -396,7 +388,7 @@ class StrSeq(Template):
         if isinstance(value, bytes):
             value = value.decode('utf-8', 'ignore')
 
-        if isinstance(value, util.STRING):
+        if isinstance(value, str):
             if self.split:
                 value = value.split()
             else:
@@ -566,13 +558,13 @@ class Filename(Template):
         except exceptions.NotFoundError:
             return self.get_default_value(view.name)
 
-        if not isinstance(path, util.BASESTRING):
+        if not isinstance(path, str):
             self.fail(
                 u'must be a filename, not {0}'.format(type(path).__name__),
                 view,
                 True
             )
-        path = os.path.expanduser(util.STRING(path))
+        path = os.path.expanduser(str(path))
 
         if not os.path.isabs(path):
             if self.cwd is not None:
@@ -709,9 +701,9 @@ def as_template(value):
         return Integer()
     elif isinstance(value, int):
         return Integer(value)
-    elif isinstance(value, type) and issubclass(value, util.BASESTRING):
+    elif isinstance(value, type) and issubclass(value, str):
         return String()
-    elif isinstance(value, util.BASESTRING):
+    elif isinstance(value, str):
         return String(value)
     elif isinstance(value, set):
         # convert to list to avoid hash related problems

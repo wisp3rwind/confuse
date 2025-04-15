@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+v2.0.0
+''''''
+- Removed Python 2 support, bump the minimum required Python version to 3.9.
+
 v1.7.0
 ''''''
 

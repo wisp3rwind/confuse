@@ -1,12 +1,5 @@
-from __future__ import division, absolute_import, print_function
-
-try:
-    import enum
-    SUPPORTS_ENUM = True
-except ImportError:
-    SUPPORTS_ENUM = False
-
 import confuse
+import enum
 import os
 import unittest
 from . import _root
@@ -93,8 +86,6 @@ class BuiltInValidatorTest(unittest.TestCase):
         })
         self.assertEqual(res, 'baz')
 
-    @unittest.skipUnless(SUPPORTS_ENUM,
-                         "enum not supported in this version of Python.")
     def test_as_choice_with_enum(self):
         class Foobar(enum.Enum):
             Foo = 'bar'
@@ -103,8 +94,6 @@ class BuiltInValidatorTest(unittest.TestCase):
         res = config['foo'].as_choice(Foobar)
         self.assertEqual(res, Foobar.Foo)
 
-    @unittest.skipUnless(SUPPORTS_ENUM,
-                         "enum not supported in this version of Python.")
     def test_as_choice_with_enum_error(self):
         class Foobar(enum.Enum):
             Foo = 'bar'
@@ -120,11 +109,6 @@ class BuiltInValidatorTest(unittest.TestCase):
     def test_as_number_int(self):
         config = _root({'i': 2})
         config['i'].as_number()
-
-    @unittest.skipIf(confuse.PY3, "long only present in Python 2")
-    def test_as_number_long_in_py2(self):
-        config = _root({'l': long(3)})  # noqa ignore=F821
-        config['l'].as_number()
 
     def test_as_number_string(self):
         config = _root({'s': 'a'})
